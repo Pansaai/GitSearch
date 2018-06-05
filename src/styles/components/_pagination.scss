@@ -1,0 +1,15 @@
+.pagination{
+    align-items: center;
+    background: darken($color: #ffffff, $amount: 3%);
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+
+    span{
+        padding: 1rem;
+        &:hover{
+            color: $red;
+            cursor: pointer;
+        }
+    }
+}
