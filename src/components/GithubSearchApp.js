@@ -9,29 +9,18 @@ class GithubSearchApp extends React.Component{
     state = {
         issues: [],
         last: '',
-        url: ''
+        next: '',
+        url: '',
+        owner: '',
+        repoName: ''
     };
-
-    componentDidUpdate = () => {
-        fetch(this.state.url)
-            .then(response => {
-                let parsedLink = this.parseLinkHeader(response.headers.get('Link'));
-                this.setLast(parsedLink);
-                return response.json();
-            })
-            .then(data => {
-                const issues = data;
-                this.setState(() => ({ issues }));
-            }). catch((error) => {
-                console.log(error);
-            });
-    }
 
     onSubmit = ({ owner, repoName }) => {
         fetch(`https://api.github.com/repos/${owner}/${repoName}/issues?page=1&per_page=30`)
             .then(response => {
                 let parsedLink = this.parseLinkHeader(response.headers.get('Link'));
                 this.setLast(parsedLink);
+                this.setNext(parsedLink);
                 return response.json();
             })
             .then(data => {
@@ -43,7 +32,7 @@ class GithubSearchApp extends React.Component{
     }
 
     parseLinkHeader = (header) => {
-        if (header.length === 0) {
+        if (header === undefined) {
             throw new Error("input must not be of zero length");
         }
     
@@ -70,9 +59,39 @@ class GithubSearchApp extends React.Component{
         }
     }
 
-    setUrlLast = () => {
+    setUrlLast = (props) => {
         const url = this.state.last;
         this.setState(() => ({ url }));
+        this.fetchPagination();
+    }
+
+    setNext = (parsedLink) => {
+        if(parsedLink.next !== undefined){
+            const next = parsedLink.next;
+            this.setState(() => ({ next }));
+        }
+    }
+
+    setUrlNext = (props) => {
+        const url = this.state.next;
+        this.setState(() => ({ url }));
+        this.fetchPagination();
+    }
+
+    fetchPagination() {
+        fetch(this.state.url)
+            .then(response => {
+                let parsedLink = this.parseLinkHeader(response.headers.get('Link'));
+                this.setLast(parsedLink);
+                this.setNext(parsedLink);
+                return response.json();
+            })
+            .then(data => {
+                const issues = data;
+                this.setState(() => ({ issues }));
+            }).catch((error) => {
+                console.log(error);
+            });
     }
 
     render(){
@@ -86,7 +105,9 @@ class GithubSearchApp extends React.Component{
                     issues={this.state.issues}
                 />
                 {
-                    this.state.issues.length > 0 && <Pagination setUrlLast={this.setUrlLast} />
+                    this.state.issues.length > 0 && <Pagination 
+                                                        setUrlLast={this.setUrlLast} 
+                                                        setUrlNext={this.setUrlNext} />
                 }
             </div>
         );
