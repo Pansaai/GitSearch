@@ -2,18 +2,36 @@ import React from 'react';
 import Header from './Header';
 import SearchForm from './SearchForm';
 import IssuesList from './IssuesList';
+import Pagination from './Pagination';
 
 class GithubSearchApp extends React.Component{
 
     state = {
-        issues: []
+        issues: [],
+        last: '',
+        url: ''
     };
+
+    componentDidUpdate = () => {
+        fetch(this.state.url)
+            .then(response => {
+                let parsedLink = this.parseLinkHeader(response.headers.get('Link'));
+                this.setLast(parsedLink);
+                return response.json();
+            })
+            .then(data => {
+                const issues = data;
+                this.setState(() => ({ issues }));
+            }). catch((error) => {
+                console.log(error);
+            });
+    }
 
     onSubmit = ({ owner, repoName }) => {
         fetch(`https://api.github.com/repos/${owner}/${repoName}/issues?page=1&per_page=30`)
             .then(response => {
-                const parsedLink = this.parseLinkHeader(response.headers.get('Link'));
-                console.log(parsedLink);
+                let parsedLink = this.parseLinkHeader(response.headers.get('Link'));
+                this.setLast(parsedLink);
                 return response.json();
             })
             .then(data => {
@@ -45,6 +63,18 @@ class GithubSearchApp extends React.Component{
         return links;
     }
 
+    setLast = (parsedLink) => {
+        if(parsedLink.last !== undefined){
+            const last = parsedLink.last;
+            this.setState(() => ({ last }));
+        }
+    }
+
+    setUrlLast = () => {
+        const url = this.state.last;
+        this.setState(() => ({ url }));
+    }
+
     render(){
         return(
             <div>
@@ -55,6 +85,9 @@ class GithubSearchApp extends React.Component{
                 <IssuesList 
                     issues={this.state.issues}
                 />
+                {
+                    this.state.issues.length > 0 && <Pagination setUrlLast={this.setUrlLast} />
+                }
             </div>
         );
     }
