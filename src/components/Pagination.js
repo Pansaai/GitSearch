@@ -6,11 +6,11 @@ class Pagination extends React.Component{
         return(
             <div className="content-container">
                 <div className="pagination">
-                    <span >First</span>
-                    <span >Prev</span>
+                    <button onClick={this.props.setUrlFirst}>First</button>
+                    <button onClick={this.props.setUrlPrev}>Prev</button>
                     <span>&#8226;</span>
-                    <span  onClick={this.props.setUrlNext}>Next</span>
-                    <span  onClick={this.props.setUrlLast}>Last</span>
+                    <button onClick={this.props.setUrlNext}>Next</button>
+                    <button  onClick={this.props.setUrlLast}>Last</button>
                 </div>
             </div>
         );
