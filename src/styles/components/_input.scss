@@ -1,8 +1,13 @@
 .input__text{
     border: 1px solid #cacccd;
-    height: 2rem;
-    font-size: 1.8rem;
+    height: .5rem;
+    font-size: 1rem;
     font-weight: 300;
     padding: $s-size;
-    margin-right: 1rem;
+
+    @media screen and (min-width: $desktop-breakpoint) {
+        height: 2rem;
+        font-size: 1.8rem;
+        margin-right: 1rem;
+    }
 }
