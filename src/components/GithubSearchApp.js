@@ -3,6 +3,7 @@ import Header from './Header';
 import SearchForm from './SearchForm';
 import IssuesList from './IssuesList';
 import Pagination from './Pagination';
+import Loader from './Loader';
 
 const getUrl = (owner, repoName, page) => `https://api.github.com/repos/${owner}/${repoName}/issues?page=${page}&per_page=30`;
 
@@ -27,6 +28,7 @@ class GithubSearchApp extends React.Component{
         if(!this.state.loading){
             this.setState({ loading: true });
         }
+        window.scrollTo(0,0);
         fetch(getUrl(owner, repoName, page))
             .then(response => {
                 this.setState({ loading: false });
@@ -68,10 +70,14 @@ class GithubSearchApp extends React.Component{
                     <SearchForm 
                         onSubmit={this.onSubmit}
                     />
-                    <IssuesList 
-                        issues={this.state.issues}
-                        loading={this.state.loading}
-                    />
+                    {
+                        this.state.loading ? 
+                        <Loader /> :
+                        <IssuesList 
+                            issues={this.state.issues}
+                            loading={this.state.loading}
+                        />
+                    }
                     {
                         this.state.issues.length > 0 
                         && 
