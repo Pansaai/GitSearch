@@ -12,7 +12,8 @@ class GithubSearchApp extends React.Component{
         issues: [],
         page: 1,
         owner: '',
-        repoName: ''
+        repoName: '',
+        loading: false
     };
 
     //on Submit of the form data -> INITIAL FETCH
@@ -23,8 +24,14 @@ class GithubSearchApp extends React.Component{
     }
 
     fetchIssues = (owner, repoName, page) => {
+        if(!this.state.loading){
+            this.setState({ loading: true });
+        }
         fetch(getUrl(owner, repoName, page))
-            .then(response => response.json())
+            .then(response => {
+                this.setState({ loading: false });
+                return response.json();
+            })
             .then(data => {
                 const issues = data;
                 this.setState(() => ({ issues }));
@@ -63,6 +70,7 @@ class GithubSearchApp extends React.Component{
                     />
                     <IssuesList 
                         issues={this.state.issues}
+                        loading={this.state.loading}
                     />
                     {
                         this.state.issues.length > 0 
