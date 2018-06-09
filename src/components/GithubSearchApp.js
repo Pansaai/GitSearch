@@ -7,14 +7,17 @@ import Loader from './Loader';
 
 const getUrl = (owner, repoName, page) => `https://api.github.com/repos/${owner}/${repoName}/issues?page=${page}&per_page=30`;
 
+
+
 class GithubSearchApp extends React.Component{
 
     state = {
         issues: [],
         page: 1,
+        last: null,
         owner: '',
         repoName: '',
-        loading: false
+        loading: false,
     };
 
     //on Submit of the form data -> INITIAL FETCH
@@ -22,6 +25,15 @@ class GithubSearchApp extends React.Component{
         this.fetchIssues(owner, repoName, this.state.page);
         this.setState(() => ({ owner }));
         this.setState(() => ({ repoName }));
+    }
+
+    getLast = (response) => {
+        const headerLinks = response.headers.get('Link');
+        const links = headerLinks.split(',');
+        let last = links[1].match(/\=([\s\S]*?)\&/g);
+        last = String(last);
+        last = last.slice(1, last.length-1);
+        return last;
     }
 
     fetchIssues = (owner, repoName, page) => {
@@ -32,6 +44,8 @@ class GithubSearchApp extends React.Component{
         fetch(getUrl(owner, repoName, page))
             .then(response => {
                 this.setState({ loading: false });
+                const last = this.getLast(response);
+                this.setState(({ last }));
                 return response.json();
             })
             .then(data => {
@@ -63,6 +77,13 @@ class GithubSearchApp extends React.Component{
         }));
     }
 
+    fetchLast = (owner, repoName) => {
+        this.fetchIssues(this.state.owner, this.state.repoName, this.state.last);
+        this.setState(() => ({
+            page: this.state.last
+        }));
+    }
+
     render(){
         return(
             <div>
@@ -82,7 +103,7 @@ class GithubSearchApp extends React.Component{
                         this.state.issues.length > 0 
                         && 
                         <Pagination 
-                            setUrlLast={this.setUrlLast}
+                            last={this.fetchLast}
                             next={this.fetchNext}
                             first={this.fetchFirst}
                             prev={this.fetchPrev}

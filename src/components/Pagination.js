@@ -10,7 +10,7 @@ class Pagination extends React.Component{
                     <button className="button" disabled={this.props.page < 2} onClick={this.props.prev}>Prev</button>
                     <span>&#8226;</span>
                     <button className="button" onClick={this.props.next}>Next</button>
-                    <button className="button"  onClick={this.props.setUrlLast}>Last</button>
+                    <button className="button"  onClick={this.props.last}>Last</button>
                 </div>
             </div>
         );
