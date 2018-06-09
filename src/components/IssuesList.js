@@ -7,7 +7,7 @@ const IssuesList = (props) => (
             {
                 props.issues.length === 0 ? (
                     <div className="issuesList__message">
-                        <span>No Issues</span>
+                        <span>Please fill in the above fields to search for the related Github Issues.</span>
                     </div>
                 ) : (
                     props.issues.map((issue) => {
