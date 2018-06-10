@@ -7,8 +7,6 @@ import Loader from './Loader';
 
 const getUrl = (owner, repoName, page) => `https://api.github.com/repos/${owner}/${repoName}/issues?page=${page}&per_page=30`;
 
-
-
 class GithubSearchApp extends React.Component{
 
     state = {
@@ -27,6 +25,7 @@ class GithubSearchApp extends React.Component{
         this.setState(() => ({ repoName }));
     }
 
+    //TODO refactor this method
     getLast = (response) => {
         const headerLinks = response.headers.get('Link');
         const links = headerLinks.split(',');
@@ -44,8 +43,10 @@ class GithubSearchApp extends React.Component{
         fetch(getUrl(owner, repoName, page))
             .then(response => {
                 this.setState({ loading: false });
-                const last = this.getLast(response);
-                this.setState(({ last }));
+                if(this.state.last === null){
+                    const last = this.getLast(response);
+                    this.setState(({ last }));
+                }
                 return response.json();
             })
             .then(data => {
@@ -108,6 +109,7 @@ class GithubSearchApp extends React.Component{
                             first={this.fetchFirst}
                             prev={this.fetchPrev}
                             page={this.state.page}
+                            lastpage={this.state.last}
                         />
                     }
             </div>
